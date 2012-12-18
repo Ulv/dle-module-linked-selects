@@ -14,10 +14,9 @@
 /*!
  * jQuery Selectbox plugin 0.2
  *
- * Copyright 2011-2012, Dimitar Ivanov (http://www.bulgaria-web-developers.com/projects/javascript/selectbox/)
- * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
- * 
- * Date: Tue Jul 17 19:58:36 2012 +0300
+ * originally developed by Dimitar Ivanov (http://www.bulgaria-web-developers.com/projects/javascript/selectbox/)
+ *
+ * modified by Vladimir Chmil <ulv8888@gmail.com>
  */
 (function ($, undefined) {
 	var PROP_NAME = 'selectbox',
@@ -48,7 +47,9 @@
 			onChange: function() {
             }, //Define a callback function when the selectbox is changed
 			onOpen: null, //Define a callback function when the selectbox is open
-			onClose: null //Define a callback function when the selectbox is closed
+            onClose: null, //Define a callback function when the selectbox is closed
+            vuzlinks: false,
+            links: null
 		};
 	}
 	
@@ -201,10 +202,21 @@
 					}
 					if (i === olen - 1) {
 						li.addClass("last");
-					}
-					if (!that.is(":disabled") && !disabled) {
+                    }
+
+                    // ссылка на вуз
+                    var lnk;
+                    if (inst.settings.vuzlinks == false) {
+                        lnk = '#'+that.val();
+                    } else {
+                        if (inst.settings.links !== null) {
+                            lnk = inst.settings.links[that.val()-1]; 
+                        }
+                    }
+
+                    if (!that.is(":disabled") && !disabled) {
 						child = $("<a>", {
-							"href": "#" + that.val(),
+							"href": lnk,
 							"rel": that.val()
 						}).text(that.text()).bind("click.sb", function (e) {
 							if (e && e.preventDefault) {
@@ -546,7 +558,8 @@
         var list_spec,
             list_region,
             list_vuz,
-            specid;
+            specid, 
+            $links;
 
 
         function chSelect(lst, url) {
@@ -566,13 +579,42 @@
                 list_region.selectbox({ 
                     onChange: function() {
                         if (undefined !== specid) {
-                            chSelect(list_vuz, 'specid=' + specid + '&regid=' + $(this).val());
+                            chSelect(list_vuz, 'specid=' + specid + '&regid=' + $(this).val(), true);
+                            
                         }
                    }
                 });
+
+
                 list_vuz.selectbox("detach");
-                list_vuz.selectbox("attach");
+                list_vuz.selectbox({
+                    onChange: function(v, i) {
+                        document.location = $links[v-1];
+                    },
+                    vuzlinks: true,
+                    links: $links
+                });
             });
+        }
+
+        // ссылки на вузы
+        function getLinks() {
+            $links = [];
+            $.ajax({
+                    async: true,
+                    type: "GET",
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    url: "engine/ajax/education.php",
+                    success: function(jsonData) {
+                        if (jsonData.status == 'ok') {
+                            $.each(jsonData.data, function(index, value) {
+                                $links.push(value.link);
+                            });
+                        }
+                    }
+            });
+
         }
 
         function init () {
@@ -581,6 +623,8 @@
             list_region = $("#education_region"),
             list_vuz    = $("#education_vuz"),
             specid=0;
+
+            getLinks();
 
             list_spec.selectbox({
                 onChange: function() {
