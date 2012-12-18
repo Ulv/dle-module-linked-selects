@@ -1,11 +1,17 @@
 <?php
 /**
-* модуль для dle 9.6 - 3 связанных списка - специальность/регион/вуз
+* модуль для dle 9.6 - 3 связанных списка, ajax, данные из mysql - специальность/регион/вуз
 *
 * author: Vladimir Chmil <ulv8888@gmail.com>
 *
 *
 */
+
+$lang = array(
+    "education_spec"=>"Специальность",
+    "education_region"=>"Регион",
+    "education_vuz"=>"ВУЗ"
+);
 
 if(!defined('DATALIFEENGINE'))
 {
@@ -14,38 +20,23 @@ if(!defined('DATALIFEENGINE'))
 
 include ('engine/api/api.class.php');
 
-$education = $dle_api->load_from_cache( "education", 60);
-var_dump($education);
+?>
 
-if ($education == false) {
-    /*$sql = $db->query("SELECT comments.post_id, comments.text, comments.autor, post.id, post.flag,
-    post.category, post.date as newsdate, post.title, post.alt_name 
-    FROM " . PREFIX . "_comments as comments, " . PREFIX . "_post as post 
-    WHERE post.id=comments.post_id 
-    ORDER BY comments.date DESC LIMIT 0,20");*/
+<label for="education_spec"><?=$lang["education_spec"]; ?></label>
+<select class="education" id="education_spec">
+<?php $sql = $db->query("select * from spec"); while ($row = $db->get_row($sql)): ?>
+    <option value="<?=$row['id'];?>"><?=$row['title'];?></option>
+<?php endwhile; ?>
+</select>
 
-    $sql = $db->query("select * from region");
+<br />
+<label for="education_region"><?=$lang["education_region"];?></label>
+<select class="education" id="education_region"></select>
 
-    
-    while ($row = $db->get_row($sql))
-    {
-        var_dump($row);
-/*        if (strlen($row['title']) > 50) {
-     			$title = substr($row['title'], 0, 50)."...";
-        } else {
-     			$title = $row['title'];
-        }
-*/
-    }
+<br />
+<label for="education_vuz"><?=$lang["education_vuz"];?></label>
+<select class="education" id="education_vuz"></select>
 
-    $db->free();
-
-    //$dle_api->save_to_cache ( "education", $education);
-} 
-
-
-
-echo $education;
-
-
+<?php
+$db->free();
 ?>
