@@ -39,3 +39,5 @@ Mysql tables:
       `title` varchar(128) COLLATE utf8_unicode_ci NOT NULL,
       PRIMARY KEY (`id`)
     ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=268 ;
+
+admin-links.php - admin script for managing links. Use existing dle user credentials to login.
