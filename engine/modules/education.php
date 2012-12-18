@@ -1,16 +1,71 @@
 <?php
 /**
-* модуль для dle 9.6 - 3 связанных списка, ajax, данные из mysql - специальность/регион/вуз
+* выбор специальность/регион/ВУЗ (связанные списки, ajax)
+*
+* модуль для dle 9.6
 *
 * author: Vladimir Chmil <ulv8888@gmail.com>
-*
-*
+* link:   https://github.com/Ulv/dle-module-linked-selects.git 
 */
+?>
 
+<script type="text/javascript">
+(function($) {
+    // ajax обработчик
+     var Education = (function ($) {
+
+        function chSelect(lst, url) {
+            $.getJSON('engine/ajax/education.php?' + url, function(data) {
+                if (data.status == 'ok') {
+                    lst.empty();
+                    $.each(data.data, function(index, value) {
+                        lst.append('<option value="'+value.id+'">'+value.title+'</option>');
+                    });
+                } else {
+                    alert('ошибка работы с бд!');
+                }
+            });
+        }
+
+        function handleEvents() {
+            var list_spec   = $("#education_spec"),
+                list_region = $("#education_region"),
+                list_vuz    = $("#education_vuz"),
+                specid;
+
+            list_spec.change(function(){
+                specid = $(this).val();
+                chSelect(list_region, 'specid=' + specid);
+            });
+
+            list_region.change(function(){
+                if (undefined !== specid) {
+                    chSelect(list_vuz, 'specid=' + specid + '&regid=' + $(this).val());
+                }
+            });
+
+        
+        }
+        function init () {
+            handleEvents();
+        }
+
+        return {
+            init: init
+        }
+    })($);
+
+    $(document).ready(function (){
+        window.education = Education.init();
+    });
+})($);
+</script>
+
+<?php
 $lang = array(
-    "education_spec"=>"Специальность",
-    "education_region"=>"Регион",
-    "education_vuz"=>"ВУЗ"
+    "education_spec"   => "Специальность",
+    "education_region" => "Регион",
+    "education_vuz"    => "ВУЗ"
 );
 
 if(!defined('DATALIFEENGINE'))
@@ -31,12 +86,14 @@ include ('engine/api/api.class.php');
 
 <br />
 <label for="education_region"><?=$lang["education_region"];?></label>
-<select class="education" id="education_region"></select>
+<select class="education" id="education_region">
+    <option value="0">--- выберите специальность ---</option>
+</select>
 
 <br />
 <label for="education_vuz"><?=$lang["education_vuz"];?></label>
-<select class="education" id="education_vuz"></select>
+<select class="education" id="education_vuz">
+    <option value="0">--- выберите специальность и регион ---</option>
+</select>
 
-<?php
-$db->free();
-?>
+<?php $db->free(); ?>
