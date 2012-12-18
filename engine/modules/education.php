@@ -9,6 +9,7 @@
 */
 ?>
 
+<?php /* js */ ?>
 <script type="text/javascript">
 (function($) {
     // ajax обработчик
@@ -66,6 +67,22 @@
 })($);
 </script>
 
+<?php /* some styling */ ?>
+
+<style type="text/css">
+    #education_wrapper { 
+        width: 100%;
+        padding: 10px;
+    }
+    #education_wrapper label {
+        min-width: 120px; 
+        display: block;
+        float: left;
+        font-weight: 600;
+    }
+    #education_wrapper select {}
+</style>
+
 <?php
 $lang = array(
     "education_spec"   => "Специальность",
@@ -81,24 +98,24 @@ if(!defined('DATALIFEENGINE'))
 include ('engine/api/api.class.php');
 
 ?>
+<div id="education_wrapper">
+    <label for="education_spec"><?=$lang["education_spec"]; ?></label>
+    <select class="education" id="education_spec" name="education_spec">
+        <?php $sql = $db->query("select * from spec"); while ($row = $db->get_row($sql)): ?>
+        <option value="<?=$row['id'];?>"><?=$row['title'];?></option>
+        <?php endwhile; ?>
+    </select>
 
-<label for="education_spec"><?=$lang["education_spec"]; ?></label>
-<select class="education" id="education_spec" name="education_spec">
-<?php $sql = $db->query("select * from spec"); while ($row = $db->get_row($sql)): ?>
-    <option value="<?=$row['id'];?>"><?=$row['title'];?></option>
-<?php endwhile; ?>
-</select>
+    <br />
+    <label for="education_region"><?=$lang["education_region"];?></label>
+    <select class="education" id="education_region" name="education_region">
+        <option value="0">--- выберите специальность ---</option>
+    </select>
 
-<br />
-<label for="education_region"><?=$lang["education_region"];?></label>
-<select class="education" id="education_region" name="education_region">
-    <option value="0">--- выберите специальность ---</option>
-</select>
-
-<br />
-<label for="education_vuz"><?=$lang["education_vuz"];?></label>
-<select class="education" id="education_vuz" name="education_vuz">
-    <option value="0">--- выберите специальность и регион ---</option>
-</select>
-
+    <br />
+    <label for="education_vuz"><?=$lang["education_vuz"];?></label>
+    <select class="education" id="education_vuz" name="education_vuz">
+        <option value="0">--- выберите специальность и регион ---</option>
+    </select>
+</div>
 <?php $db->free(); ?>
